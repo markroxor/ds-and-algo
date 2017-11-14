@@ -1,0 +1,3751 @@
+#include<stdio.h>
+#include<limits.h>
+
+class Node
+{
+    public:
+        int src,dest,weight;
+};
+
+class Graph
+{
+    public:
+        int V;
+        int E;
+        Node *edge;
+        Graph(int v,int e);
+};
+
+Graph:: Graph(int v,int e)
+{
+    V = v;
+    E = e;
+    edge = new Node[e];
+}
+
+void BellmanFord(Graph *graph,int src)
+{
+    int V = graph->V;
+    int dist[V];
+
+    for(int i=0;i<V;i++)
+        dist[i] = INT_MAX;
+
+    dist[src]=0;
+
+    for(int k=0;k<V;k++)
+    {
+        for(int i=0;i<graph->E;i++)
+        {
+            int src = graph->edge[i].src;
+            int dest = graph->edge[i].dest;
+            int wt = graph->edge[i].weight;
+
+            if(dist[src]!=INT_MAX and dist[dest]>dist[src]+wt)
+            {
+                if(k==V-1)
+                    printf("nega!\n");
+                else
+                    dist[dest] = dist[src]+wt;
+            }
+        }
+
+    }
+
+    for(int i=0;i<V;i++)
+        printf("%d - %d\n",i,dist[i]);
+
+}
+
+// Driver program to test above functions
+int main()
+{
+    /* Let us create the graph given in above example */
+    int V = 5;  // Number of vertices in graph
+    int E = 8;  // Number of edges in graph
+    Graph *graph = new Graph(V, E);
+
+    // add edge 0-1 (or A-B in above figure)
+    graph->edge[0].src = 0;
+    graph->edge[0].dest = 1;
+    graph->edge[0].weight = -1;
+
+    // add edge 0-2 (or A-C in above figure)
+    graph->edge[1].src = 0;
+    graph->edge[1].dest = 2;
+    graph->edge[1].weight = 4;
+
+    // add edge 1-2 (or B-C in above figure)
+    graph->edge[2].src = 1;
+    graph->edge[2].dest = 2;
+    graph->edge[2].weight = 3;
+
+    // add edge 1-3 (or B-D in above figure)
+    graph->edge[3].src = 1;
+    graph->edge[3].dest = 3;
+    graph->edge[3].weight = 2;
+
+    // add edge 1-4 (or A-E in above figure)
+    graph->edge[4].src = 1;
+    graph->edge[4].dest = 4;
+    graph->edge[4].weight = 2;
+
+    // add edge 3-2 (or D-C in above figure)
+    graph->edge[5].src = 3;
+    graph->edge[5].dest = 2;
+    graph->edge[5].weight = 5;
+
+    // add edge 3-1 (or D-B in above figure)
+    graph->edge[6].src = 3;
+    graph->edge[6].dest = 1;
+    graph->edge[6].weight = 1;
+
+    // add edge 4-3 (or E-D in above figure)
+    graph->edge[7].src = 4;
+    graph->edge[7].dest = 3;
+    graph->edge[7].weight = -3;
+
+    BellmanFord(graph, 0);
+
+    return 0;
+}
+#include<stdio.h>
+
+class Node
+{
+    public:
+    Node *next;
+    int data;
+};
+
+class ll
+{
+    public:
+    Node *head;
+    void push(int data);
+};
+
+void ll::push(int data)
+{
+    Node *temp = new Node;
+    temp->data = data;
+    temp->next = head;
+    head = temp;
+}
+
+class Graph
+{
+    ll *adjList;
+    int N;
+public:
+    Graph(int n);
+    void addEdge(int src,int dest);
+    void printGraph();
+    void graphColoring(int m);
+    bool graphColoringUtil(int m,int k,int colors[]);
+    bool isSafe(int i,int m,int colors[]);
+};
+
+Graph::Graph(int n)
+{
+    N = n;
+    adjList = new ll[n];
+    for(int i=0;i<N;i++)
+        adjList[i].head = NULL;
+}
+
+void Graph::addEdge(int src,int dest)
+{
+    adjList[src].push(dest);
+}
+
+void Graph::printGraph()
+{
+    for(int i=0;i<N;i++)
+    {
+        printf("AjList of %d\n",i);
+        Node *cur;
+        cur = adjList[i].head;
+
+        while(cur)
+        {
+            printf("%d ",cur->data);
+            cur = cur->next;
+        }
+        printf("\n");
+    }
+}
+
+void printArray(int colors[],int n)
+{
+    printf("Printing array\n");
+    for(int i=0;i<n;i++)
+        printf("%d ",colors[i]);
+    printf("\n");
+}
+
+bool Graph::isSafe(int src,int m,int colors[])
+{
+    Node *cur;
+    cur = adjList[src].head;
+    
+    while(cur)
+    {
+        if(colors[cur->data] == m)
+            return false;
+            cur = cur->next;
+    }
+    
+    return true;
+    
+}
+
+
+bool Graph::graphColoringUtil(int v,int m,int colors[])
+{
+    if(v==N)
+        return true;
+
+    for(int i=0;i<m;i++)
+    {
+        if(isSafe(v,i,colors))
+        {
+            colors[v] = i;
+            if(graphColoringUtil(v+1,m,colors))
+                return true;
+                colors[v] = -1;
+        }
+    }
+    
+    return false;
+}
+void Graph::graphColoring(int m)
+{
+    int colors[N];
+    for(int i=0;i<N;i++)
+        colors[i] = -1;
+
+    if(graphColoringUtil(0,m,colors))
+    {
+        for(int i=0;i<N;i++)
+            printf("%d %d\n",i,colors[i]);
+        return;
+    } 
+    
+    printf("No Solution");
+    return;
+}
+
+int main()
+{
+    Graph  g(4);
+
+    g.addEdge(0,1);
+    g.addEdge(0,2);
+    g.addEdge(0,3);
+    g.addEdge(1,0);
+    g.addEdge(1,2);
+    g.addEdge(2,0);
+    g.addEdge(2,1);
+    g.addEdge(2,3);
+    g.addEdge(3,0);
+    g.addEdge(3,2);
+    
+    g.printGraph();
+    printf("\n");
+    g.graphColoring(3);
+    return 0;
+}
+#include<stdio.h>
+
+int coinChange(int change[],int size,int n)
+{
+    int count[n+1];
+    for(int i=0;i<=n+1;i++)
+        count[i]=1;
+
+    for(int i=0;i<size;i++)
+    {
+        for(int j=0;j<=n;j++)
+        {
+            if(j==0)
+                count[i]=1;
+            else if(change[j]>=i)
+                continue;
+            else
+            count[j] += count[j-change[i]];
+        } 
+    }
+
+    return count[n];
+}
+
+int main()
+{
+    int arr[] = {1, 2, 3};
+    int m = sizeof(arr)/sizeof(arr[0]);
+    int n = 4;
+    printf(" %d ", coinChange(arr, m, n));
+    return 0;
+}
+#include<stdio.h>
+#include<limits.h>
+int max(int a,int b)
+{return a>b?a:b;}
+
+int cutRod(int rod[], int size)
+{
+    int profit[size+1];
+    profit[0] = 0;
+
+    for(int l=1;l<=size;l++)
+    {
+        int length = l;
+        profit[l] = rod[l-1];
+
+        for(int i=1;i<=l;i++)
+        {
+            profit[l] = max(rod[i-1]+profit[l-i],profit[l]);
+        }
+    }
+
+    return profit[size];
+}
+
+/* Driver program to test above functions */
+int main()
+{
+    int arr[] = {1, 5, 8, 9, 10, 17, 17, 20};
+    int size = sizeof(arr)/sizeof(arr[0]);
+    printf("Maximum Obtainable Value is %d\n", cutRod(arr, size));
+    return 0;
+}
+#include <stdio.h>
+#include<limits.h>
+#define V 9
+
+int minKeyIndex(int distance[],int visited[])
+{
+    int ind=-1,mini=INT_MAX;
+    for(int v=0;v<V;v++)
+    {
+        if(not visited[v] and distance[v]<mini)
+            ind=v,mini = distance[v];
+    }
+
+    return ind;
+}
+
+void dijkstra(int graph[V][V],int src)
+{
+    int visited[V],distance[V],par[V];
+    for (int i=0;i<V;i++)
+        visited[i] = 0,distance[i]=INT_MAX;
+
+    distance[src]=src;
+    visited[src]=1;
+    par[src]=-1;
+
+    int count=V,minInd=src;
+    while(V>=0 and --count)
+    {
+
+        for(int i=0;i<V;i++)
+        {
+            if(not visited[i] and graph[minInd][i] and distance[i]>distance[minInd]+graph[minInd][i])
+                distance[i]=graph[minInd][i]+distance[minInd],par[i]=minInd;
+        }
+
+        minInd = minKeyIndex(distance,visited);
+        visited[minInd] = 1;
+
+    }
+
+    for(int i=0;i<V;i++)
+        printf("%d        wt=%d\n",i,distance[i]);
+}
+
+
+int main()
+{
+/* Let us create the example graph discussed above */
+    int graph[V][V] = {{0, 4, 0, 0, 0, 0, 0, 8, 0},
+                        {4, 0, 8, 0, 0, 0, 0, 11, 0},
+                        {0, 8, 0, 7, 0, 4, 0, 0, 2},
+                        {0, 0, 7, 0, 9, 14, 0, 0, 0},
+                        {0, 0, 0, 9, 0, 10, 0, 0, 0},
+                        {0, 0, 4, 14, 10, 0, 2, 0, 0},
+                        {0, 0, 0, 0, 0, 2, 0, 1, 6},
+                        {8, 11, 0, 0, 0, 0, 1, 0, 7},
+                        {0, 0, 2, 0, 0, 0, 6, 7, 0}
+                        };
+
+    dijkstra(graph, 0);
+
+    return 0;
+}
+#include<stdio.h>
+#include<string.h>
+using namespace std;
+
+int min(int a,int b)
+{
+    return a>b?b:a;
+}
+
+int max(int a,int b)
+{
+    return a>b?a:b;
+}
+
+int editDist(char *st1,char *st2, int m,int n)
+{
+    int dist[m+1][n+1];
+    for(int i=0;i<=m;i++)
+        for(int j=0;j<=n;j++)
+        {
+            if(i==0)
+                dist[i][j] = j;
+            else if(j==0)
+                dist[i][j] = i;
+            else if (st1[i-1]==st2[j-1])
+                dist[i][j] = dist[i-1][j-1];
+            else
+                dist[i][j] = 1+min(min(dist[i-1][j],dist[i][j-1]),dist[i-1][j-1]);
+        }
+
+    return dist[m][n];
+}
+
+
+int main()
+{
+    // your code goes here
+    char str1[] = "sunday";
+    char str2[] = "saturday";
+    
+    printf("%d\n", editDist( str1 , str2 , strlen(str1), strlen(str2)));
+    
+    return 0;
+                          
+}
+#include<stdio.h>
+#include<limits.h>
+
+int max(int a,int b)
+{
+    return a>b?a:b;
+}
+
+int min(int a,int b)
+{
+    return a<b?a:b;
+}
+
+int eggDrop(int eggs,int floors)
+{
+    int dp[eggs+1][floors+1];
+    for(int i=1;i<=eggs;i++)
+        dp[i][0]=0,dp[i][1]=1;
+
+    for(int j=1;j<=floors;j++)
+        dp[1][j] = j;
+
+    for(int i=2;i<=eggs;i++)
+        for(int j=2;j<=floors;j++)
+        {
+            dp[i][j] = INT_MAX;
+            for(int k=1;k<=j;k++)
+            {
+                /*
+                if(i==1)
+                    dp[i][j] = j;
+                else if (j==0)
+                    dp[i][j] = 0;
+                else if (j==1)
+                    dp[i][j] = 1;
+                else*/
+                    dp[i][j] = min(dp[i][j],1+max(dp[i-1][k-1],dp[i][j-k]));
+            }
+        }
+
+    return dp[eggs][floors];
+}
+
+int main()
+{
+    int n = 2, k = 36;
+    printf ("\nMinimum number of trials in worst case with %d eggs and "
+    "%d floors is %d \n", n, k, eggDrop(n, k));
+    return 0;
+}
+#include<stdio.h>
+#include<limits.h>
+#include<cmath>
+#define V 4
+#define INF 9999
+
+void printSolution(int dist[V][V]);
+
+void floydWarshall(int graph[V][V])
+{
+    int dist[V][V];
+    for(int i=0;i<V;i++)
+        for(int j=0;j<V;j++)
+                dist[i][j] = graph[i][j];
+
+    for(int i=0;i<V;i++)
+        for(int j=0;j<V;j++)
+            for(int k=0;k<V;k++)
+                if(dist[i][k]>dist[i][j]+dist[j][k])
+                    dist[i][k] = dist[i][j]+dist[j][k];
+
+    printSolution(dist);
+
+}
+
+/* A utility function to print solution */
+void printSolution(int dist[][V])
+{
+    printf ("Following matrix shows the shortest distances"
+    " between every pair of vertices \n");
+    for (int i = 0; i < V; i++)
+    {
+        for (int j = 0; j < V; j++)
+        {
+            if (dist[i][j] == INF)
+            printf("%7s", "INF");
+            else
+            printf ("%7d", dist[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+// driver program to test above function
+int main()
+{
+    /* Let us create the following weighted graph
+    10
+    (0)------->(3)
+    |         /|\
+    5 |          |
+    |          | 1
+    \|/         |
+    (1)------->(2)
+    3           */
+    int graph[V][V] = { {0,   5,  INF, 10},
+                        {INF, 0,   3, INF},
+                        {INF, INF, 0,   1},
+                        {INF, INF, INF, 0}
+                        };
+
+    // Print the solution
+    floydWarshall(graph);
+    return 0;
+}
+#include <stdio.h>
+#include <limits.h>
+#include <iostream>
+using namespace std;
+#define V 6
+
+int max(int a,int b)
+{
+    return a>b?a:b;
+}
+
+int min(int a,int b)
+{
+    return a<b?a:b;
+}
+
+class Queue
+{
+    int front;
+    int rear;
+    int size;
+    int cap;
+    int *arr;
+public:
+    void Enqueue(int i);
+    int Dequeue();
+    Queue(int cap);
+    bool isFull();
+    bool isEmpty();
+};
+
+Queue::Queue(int c)
+{
+    arr = new int[c];
+    front=0;
+    rear=c-1;
+    size = 0;
+    cap=c;
+}
+
+void Queue::Enqueue(int i)
+{
+    if(isFull())
+        return;
+
+    size++;
+    rear = (rear+1)%cap;
+    arr[rear] = i;
+}
+
+int Queue::Dequeue()
+{
+    if(isEmpty())
+        return -1;
+
+    size--;
+    int data = arr[front];
+    front = (front+1)%cap;
+    return data;
+}
+
+bool Queue::isFull()
+{
+    return size==cap;
+}
+
+bool Queue::isEmpty()
+{
+    return (!size);
+}
+
+bool bfs(int graph[V][V],int src,int dest,int parent[])
+{
+    int visited[V];
+    for(int i=0;i<V;i++)
+        visited[i] = 0;
+
+    Queue q(V);
+    visited[src] = 1;
+    q.Enqueue(src);
+   
+    while(!q.isEmpty())
+    {
+        src = q.Dequeue();
+
+        for(int i=0;i<V;i++)
+        {
+            if(graph[src][i] and not visited[i])
+            {
+                parent[i] = src;
+                visited[i] = 1;
+                q.Enqueue(i);
+            }
+        }
+    }
+
+    return visited[dest];
+}
+
+int fordFulkerson(int graph[V][V],int src,int dest)
+{
+    int parent[V];
+    for(int i=0;i<V;i++)
+        parent[i] = -1;
+    
+    int max_flow = 0;
+
+    while(bfs(graph,src,dest,parent))
+    {
+
+        int path_flow = INT_MAX;
+        for(int cur=dest;cur!=src;cur=parent[cur])
+            path_flow = min(path_flow,graph[parent[cur]][cur]);
+
+        for(int cur=dest;cur!=src;cur=parent[cur])
+        {
+            graph[parent[cur]][cur] -= path_flow;
+            graph[cur][parent[cur]] += path_flow;
+        }
+        
+        max_flow += path_flow;
+    }
+
+    return max_flow;
+}
+
+int main()
+{
+    //Let us create a graph shown in the above example
+    int graph[V][V] = { {0, 16, 13, 0,  0,  0},
+                        {0, 0,  10, 12, 0,  0},
+                        {0, 4,  0,  0,  14, 0},
+                        {0, 0,  9,  0,  0,  20},
+                        {0, 0,  0,  7,  0,  4},
+                        {0, 0,  0,  0,  0,  0}
+                        };
+    cout << "The maximum possible flow is " << fordFulkerson(graph, 0, 5);
+       
+    return 0;
+}
+#include<stdio.h>
+#include<stdlib.h>
+using namespace std;
+
+class AdjListNode
+{
+    public:
+    int v;
+    class AdjListNode *next;
+};
+
+class AdjList
+{
+    public:
+    AdjListNode *head;
+};
+
+class Graph
+{
+    public:
+    int v;
+    AdjList *array;
+};
+
+class AdjListNode* newAdjListNode(int dest)
+{
+    AdjListNode *newNode = (AdjListNode*) malloc(sizeof(AdjListNode));
+    newNode->v = dest;
+    newNode->next = NULL;
+    return newNode;
+};
+
+class Graph *createGraph(int v)
+{
+    Graph *graph = new Graph;//(Graph*) malloc(sizeof(Graph));
+    graph->v = v;
+    graph->array = new AdjList[v];// malloc(v * sizeof(AdjList))
+
+    for(int i=0;i<v;i++)
+        graph->array[i].head = NULL;
+    
+    return graph;
+};
+
+void addEdge(Graph *graph, int src,int dest)
+{
+    AdjListNode *newNode = newAdjListNode(dest);
+    newNode->next = graph->array[src].head;
+    graph->array[src].head = newNode;
+
+    newNode = newAdjListNode(src);
+
+    newNode->next = graph->array[dest].head;
+    graph->array[dest].head = newNode; 
+}
+
+void printGraph(Graph *graph)
+{
+    for(int i=0;i<graph->v;i++)
+    {
+        AdjListNode *cur = graph->array[i].head;
+        while(cur)
+            {
+                printf("%d->",cur->v);
+                cur = cur->next;
+            }
+        printf("\n");
+    }
+}
+
+int main()
+{
+    int V=5;
+    Graph *graph = createGraph(V);
+    addEdge(graph,0,1);
+    addEdge(graph,0,4);
+    addEdge(graph,1,2);
+    addEdge(graph,1,3);
+    addEdge(graph,1,4);
+    addEdge(graph,2,3);
+    addEdge(graph,3,4);
+    printGraph(graph);
+
+    return 0;
+}
+#include<stdio.h>
+
+class Queue
+{
+    int front,rear, size;
+    int *array;
+    int capacity;
+public:
+    Queue(int capacity);
+    bool isFull();
+    bool isEmpty();
+    void enqueue(int item);
+    int dequeue();
+    int Front();
+    int Rear();
+
+};
+
+Queue::Queue(int cap) 
+{
+    capacity = cap;
+    front = size = 0;
+    rear = capacity-1;
+    array = new int[capacity];
+}
+
+bool Queue::isFull()
+{
+    return size==capacity;
+}
+
+bool Queue::isEmpty()
+{
+    return not size;
+}
+
+void Queue::enqueue(int item)
+{
+    if(isFull())
+        return;
+    size++;
+    ++rear%=capacity;
+    array[rear] = item;
+}
+
+int Queue::dequeue()
+{
+    if(isEmpty())
+        return -1;
+    size--;
+    int item = array[front];
+    ++front%=capacity;
+
+    return item;
+}
+
+int Queue::Front()
+{
+    if(isEmpty())
+        return -1;
+    return array[front];
+}
+
+int Queue::Rear()
+{
+    if(isEmpty())
+        return -1;
+    return array[rear];
+}
+
+
+class Stack
+{
+    int capacity;
+    int cur;
+    char *array;
+public:
+    Stack(int n);
+    char pop();
+    bool isEmpty();
+    void push(char c);
+    char peek();
+};
+
+Stack::Stack(int cap)
+{
+    capacity = cap;
+    array = new char[cap];
+    cur=0;
+};
+
+char Stack::pop()
+{
+    return array[--cur];
+};
+
+char Stack::peek()
+{
+    return array[cur-1];
+}
+
+void Stack::push(char c)
+{
+    array[cur++]=c;
+}
+
+bool Stack::isEmpty()
+{
+    return not cur;
+}
+
+class Node
+{
+public:
+    int v;
+    Node *next;
+};
+
+
+class list
+{
+    public:
+    Node *head;
+};
+
+
+class Graph
+{
+    list *mesh;
+    int n;
+
+public:
+    Graph(int n);
+    void addEdge(int x,int y);
+    void printGraph();
+    void dfs();
+    void bfs(int n);
+};
+
+
+Graph::Graph(int n)
+{
+    this->n = n;
+    this->mesh = new list[n];
+
+    for(int i=0;i<n;i++)
+        this->mesh[i].head = NULL;
+};
+
+
+void Graph::addEdge(int x, int y)
+{
+
+    Node *node = new Node;
+    node->v = y;
+    node->next = this->mesh[x].head;
+    
+    this->mesh[x].head = node;
+     
+   // node = new Node;
+   // node->v = x;
+   // node->next = this->mesh[y].head;
+   // this->mesh[y].head = node;
+    
+};
+
+
+void Graph::printGraph()
+{
+    for(int i=0; i<this->n; i++)
+    {
+        printf("Adj list of vertex %d\n",i);
+        Node *cur = this->mesh[i].head;
+        while(cur)
+        {
+            printf("%d->",cur->v);
+            cur = cur->next;
+        }
+        printf("\n");
+    }
+
+};
+
+void Graph::dfs()
+{
+    printf("DFS\n");
+    int visited[this->n];
+    for(int i=0;i<this->n;i++)
+        visited[i] = 0;
+    
+
+    for(int i=0;i<this->n;i++)
+    {
+        Node *cur = this->mesh[i].head;
+        
+        if(not visited[i])
+            printf("\nroot %d ->\n",i);
+        
+        visited[i] = 1;
+
+        while(cur)
+        {
+            if(not visited[cur->v])
+            {    
+                printf("%d->",cur->v);
+                visited[cur->v] = 1;
+            }
+            cur = cur->next;
+        }
+    }
+        printf("\n");
+}
+
+void Graph::bfs(int src)
+{
+    Queue q(n);
+    int visited[n];
+    for(int i=0;i<n;i++)
+        visited[i] = 0;
+    
+    q.enqueue(src);
+    visited[src] = 1;
+    
+    while(!q.isEmpty())
+    {
+
+        int root = q.dequeue();
+        printf("%d-",root);
+        Node *cur = mesh[root].head;
+        visited[root] = 1;
+        
+
+        while(cur)
+        {
+            if(!visited[cur->v])
+            {
+                q.enqueue(cur->v);
+                visited[cur->v] = 1;
+            }
+            cur = cur->next;
+        }
+    }
+        printf("\n");
+}
+
+int main()
+{
+    Graph graph(4);
+    graph.addEdge(0,1);
+    graph.addEdge(0,2);
+    graph.addEdge(1,2);
+    graph.addEdge(2,0);
+    graph.addEdge(2,3);
+    graph.addEdge(3,3);
+
+    graph.printGraph();
+ 
+    printf("Following is Breadth First Traversal(starting from vertex 2) \n");
+
+
+    Graph g(6);
+    g.addEdge(5, 2);
+    g.addEdge(5, 0);
+    g.addEdge(4, 0);
+    g.addEdge(4, 1);
+    g.addEdge(2, 3);
+    g.addEdge(3, 1);
+    graph.bfs(2);
+    g.dfs();
+                                 
+    return 0;
+}
+
+
+
+#include <stdio.h>
+
+bool hamCycleUtil(bool *graph,int *par,int covered,int src,int V)
+{
+    if(covered==V)
+    {
+        if(graph[V*src])
+        {
+            par[0]=src;
+            return true;
+        }
+        return false;
+    }
+
+    for(int i=0;i<V;i++)
+    {
+        if(graph[src*V+i]==0 or par[i]!=-1)
+            continue;
+
+        par[i] = src;
+        if(hamCycleUtil(graph,par,covered+1,i,V))
+            return true;
+
+        par[i] = -1;
+    }
+
+    return false;
+}
+
+void hamCycle(bool *graph,int V)
+{
+    int par[V];
+    for(int i=0;i<V;i++)
+        par[i] = -1;
+
+    
+    par[0]=0;
+    
+    if(hamCycleUtil(graph,par,1,0,V))
+    {
+        int p =par[0];
+    
+        printf("0-");
+        while(p)
+        {
+            printf("%d-",p);
+            p = par[p];
+        }
+    }
+    //    printSolution(par);
+
+}
+
+void printGraph(bool *graph,int V)
+{
+    for(int i=0;i<V;i++)
+    {
+        printf("%d - ",i);
+        for(int j=0;j<V;j++)
+            printf("%d ",graph[i*V+j]);
+
+        printf("\n");
+    }
+}
+// driver program to test above function
+int main()
+{
+    /* Let us create the following graph
+    (0)--(1)--(2)
+    |   / \   |
+    |  /   \  |
+    | /     \ |
+    (3)-------(4)    */
+    int V=5;
+    bool graph1[V][V] = {{0, 1, 0, 1, 0},
+                        {1, 0, 1, 1, 1},
+                        {0, 1, 0, 0, 1},
+                        {1, 1, 0, 0, 1},
+                        {0, 1, 1, 1, 0},
+                        };
+
+    // Print the solution
+
+    /* Let us create the following graph
+    (0)--(1)--(2)
+    |   / \   |
+    |  /   \  |
+    | /     \ |
+    (3)       (4)    */
+    bool graph2[V][V] = {{0, 1, 0, 1, 0},
+                        {1, 0, 1, 1, 1},
+                        {0, 1, 0, 0, 1},
+                        {1, 1, 0, 0, 0},
+                        {0, 1, 1, 0, 0},
+                    };
+
+    // Print the solution
+    bool graph3[10][10];
+    for(int i=0;i<10;i++)
+        for(int j=0;j<10;j++)
+            graph3[i][j] = 0;
+
+    int arr[28]={2, 1, 10, 2, 6, 3, 5, 4, 10, 5, 10, 6, 6, 7, 6, 8, 10, 9, 4, 9, 3, 8, 3, 7, 5, 9, 6, 5};
+    for(int i=0;i<14;i++)
+        graph3[arr[2*i+1]-1][arr[2*i]-1] = 1,graph3[arr[2*i]-1][arr[2*i+1]-1] = 1;
+    
+    V = 10;
+    printGraph((bool *)graph3,V);
+    hamCycle((bool *)graph3,V);
+
+    return 0;
+}
+#include<stdio.h>
+#include<iostream>
+#include<limits.h>
+
+using namespace std;
+void swap(int *a,int *b)
+{
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+class MinHeap
+{
+    int cap;
+    int *arr;
+    int size;
+    public:
+    MinHeap(int CAP){cap = CAP;arr = new int[cap];size=0; };
+    void insertKey(int key);
+    int extractMin();
+    void decreaseKey(int i,int new_val);
+    void deleteKey(int i);
+    void minHeapify(int i);
+    int getMin();
+    bool isEmpty();
+};
+
+void MinHeap:: minHeapify(int i)
+{
+    int mini = i;
+    int left = 2*i + 1;
+    int right = 2*i + 2;
+
+    if(left<size and arr[left]<arr[i])
+        mini = left;
+    if(right<size and arr[right]<arr[i])
+        mini = right;
+
+    if(mini!=i)
+    {
+        swap(&arr[mini],&arr[i]);
+        minHeapify(mini);
+    }
+}
+
+void MinHeap::insertKey(int key)
+{
+    if(size==cap)
+    {
+        printf("cant insert, min heap full.\n");
+        return;
+    }
+    size++;
+    arr[size-1] = key;
+    int i=size-1;
+    int parent = (i-1)/2;
+    while(i>=0 and arr[parent]>arr[i] )
+    {
+        swap(&arr[parent],&arr[i]);
+        i = parent;
+        parent = (i-1)/2;
+    }
+}
+
+void MinHeap:: decreaseKey(int i,int new_val)
+{
+    arr[i] = new_val;
+    int parent = (i-1)/2;
+
+    while(i>=0 and arr[parent]>arr[i])
+    {
+        swap(&arr[i],&arr[parent]);
+        i = parent;
+        parent = (i-1)/2;
+    }
+}
+
+int MinHeap:: extractMin()
+{
+    int mini = arr[0];
+    arr[0] = arr[size-1];
+    size--;
+    minHeapify(0);
+    return mini;
+}
+
+void MinHeap:: deleteKey(int i)
+{
+    decreaseKey(i,INT_MIN);
+    extractMin();
+}
+
+int MinHeap:: getMin()
+{return arr[0];}
+
+bool MinHeap:: isEmpty()
+{return size==0;}
+int main()
+{
+    MinHeap h(11);
+    h.insertKey(3);
+    h.insertKey(2);
+    //h.deleteKey(1);
+    h.insertKey(15);
+    h.insertKey(5);
+    h.insertKey(4);
+    h.insertKey(45);
+    //cout << h.extractMin() << " ";
+    //cout << h.getMin() << " ";
+   // h.decreaseKey(2, 1);
+    while(!h.isEmpty())
+    cout << h.extractMin()<<"\n";
+    return 0;
+}
+#include<stdio.h>
+#include<iostream>
+using namespace std;
+
+class Shape {
+    protected:
+    int width, height;
+
+    public:
+    Shape( int a = 0, int b = 0) {
+    width = a;
+    height = b;
+        }
+
+    virtual int area() {
+    cout << "Parent class area :" <<endl;
+    return 0;
+    }
+};
+
+class Rectangle: public Shape {
+    public:
+    Rectangle( int a = 0, int b = 0):Shape(a, b) { }
+    virtual int area () { 
+    cout << "Rectangle class area :" <<endl;
+    return (width * height); 
+    }
+};
+
+class Triangle: public Shape{
+    public:
+    Triangle( int a = 0, int b = 0):Shape(a, b) { }
+    int area () { 
+    cout << "Triangle class area :" <<endl;
+    return (width * height / 2); 
+    }
+};
+
+class polygon
+{
+    protected:
+    int a,b;
+    public:
+    int set_size(int x,int y){a=x;b=y;};
+};
+
+class rect:public polygon
+{
+    public:
+    int area(){return a*b;};
+};
+
+int main()
+{
+    Shape *shape;
+    Rectangle rec(10,7);
+    Triangle  tri(10,5);
+
+    // store the address of Rectangle
+    shape = &rec;
+
+    // call rectangle area.
+    shape->area();
+
+    // store the address of Triangle
+    shape = &tri;
+
+    // call triangle area.
+    shape->area();
+    //rect r;
+    //r.set_size(2,3);
+    //printf("%d\n",r.area());
+}
+#include<stdio.h>
+class Edge
+{
+    public:
+    int src,dest;
+};
+
+class Graph
+{
+    public:
+    int V;
+    int E;
+    Edge *edge;
+    Graph(int v,int e);
+};
+
+Graph::Graph(int v,int e)
+{
+    V = v;
+    E = e;
+    edge = new Edge[e];
+}
+
+
+class Subset
+{
+    public:
+    int rank;
+    int par;
+};
+
+int find(Subset subset[],int i)
+{
+    if(subset[i].par==i)
+        return i;
+
+    return find(subset,subset[i].par);
+}
+
+void Union(Subset subset[],int i,int j)
+{
+    int ipar = find(subset,i);
+    int jpar = find(subset,j);
+
+    if(subset[i].rank<subset[j].rank)
+        subset[i].par = jpar;
+    else if(subset[i].rank>subset[j].rank)
+        subset[j].par = ipar;
+    else
+    {
+        subset[i].rank++;
+        subset[j].par = ipar;
+    }
+
+}
+
+bool isCycle(Graph graph,int V)
+{
+    Subset subset[V];
+    for(int i=0;i<V;i++)
+        subset[i].par=i,subset[i].rank=0;
+
+    for(int k=0;k<graph.E;k++)
+    {
+        int i=graph.edge[k].src;
+        int j=graph.edge[k].dest;
+
+        int pari = find(subset,i);
+        int parj = find(subset,j);
+
+        if(pari==parj)
+            return true;
+        Union(subset,pari,parj);
+    }
+    return false;
+}
+
+int main()
+{
+        /* Let us create following graph
+            0
+            |  \
+            |    \
+            1-----2 */
+    int V = 3, E = 3;
+    Graph graph(V, E);
+
+    // add edge 0-1
+    graph.edge[0].src = 0;
+    graph.edge[0].dest = 1;
+
+    // add edge 1-2
+    graph.edge[1].src = 1;
+    graph.edge[1].dest = 2;
+
+    // add edge 0-2
+    //graph.edge[2].src = 0;
+    //graph.edge[2].dest = 2;
+
+    if (isCycle(graph,V))
+    printf( "Graph contains cycle" );
+    else
+    printf( "Graph doesn't contain cycle" );
+
+    return 0;
+}
+#include<stdio.h>
+
+class Node
+{
+    public:
+    int value;
+    Node *next;
+    Node(int v){value=v,next=NULL;}
+};
+
+class graph
+{
+public:
+    int V;
+    Node *adjList;
+    Graph(int v){V=v;adjList = new Node[v];};
+    void addEdge(int src,int dest);
+};
+
+
+
+int main()
+{
+        // Create a graph given in the above diagram
+    Graph g(4);
+    g.addEdge(0, 1);
+    g.addEdge(0, 2);
+    g.addEdge(1, 2);
+    g.addEdge(2, 0);
+    g.addEdge(2, 3);
+    g.addEdge(3, 3);
+
+    if(g.isCyclic())
+        cout << "Graph contains cycle";
+    else
+        cout << "Graph doesn't contain cycle";
+
+    return 0;
+}
+#include<stdio.h>
+#include<cstring>
+using namespace std;
+
+int *printLCS(char str[])
+{
+    int len = strlen(str);
+    int *lcs = new int[len];
+    lcs[0] = 0;
+    for(int i=1;i<len;i++)
+    {
+        if(str[i]==str[lcs[i-1]])
+            lcs[i] = lcs[i-1]+1;
+        else if(str[i]==str[i-1])
+            lcs[i] = lcs[i-1];
+        else
+            lcs[i] = 0;
+    }
+
+    return lcs;
+}
+
+void kmp(char str[], char pat[])
+{
+    int n = strlen(str);
+    int m = strlen(pat);
+    int *lcs = printLCS(pat);
+    for(int i=0;i<strlen(pat);i++)printf("%d ",lcs[i]);
+
+    int i=0,j=0;
+    int st=-1;
+    printf("\n");
+    while(i<n and j!=m)
+    {
+        printf("i=%d j=%d lcs[j]=%d\n",i,j,lcs[j]);
+        if(str[i]==pat[j])
+        {
+            if(st==-1)
+                st=i;
+            printf("same %c\n",str[i]);
+            i++;
+            j++;
+        }
+        else
+        {
+            if(j)
+            {j = lcs[j-1];}
+            else
+            {
+            st=-1;
+            i++;
+            }
+        }
+
+    }
+
+    if(j==m)
+        printf("Found at i %d\n",st);
+    else
+        printf("Not found\n");
+}
+
+int main()
+{
+    char str[] = "ABABDABACDABABCABAB";
+    char pat[] = "ABABCABAB";
+    char str1[] = "jhaksjkjlkdjslkjljlkjdlkjasljdlkjasldjljjdlksajdlksajdyuiwqoupoklajhjhj";//"I DO NOT LIKE SEVENTY SEV BUT SEVENTY SEVENTY SEVEN";
+    char pat1[] = "jlkjdlkj";//"SEVENTY SEVEN";
+    kmp(str1, pat1);
+    return 0;
+}
+#include<stdio.h>
+#include<limits.h>
+
+int min(int a,int b)
+{
+    return a<b?a:b;
+}
+
+int max(int a,int b)
+{
+    return a>b?a:b;
+}
+int knapSack(int W,int wt[],int val[],int n)
+{
+    int knap[n+1][W+1];
+    for(int i=0;i<=n;i++)
+        for(int w=0;w<=W;w++)
+        {
+            if(w==0 or i==0)
+                knap[i][w] = 0;
+            else if(wt[i-1]<=w)
+                knap[i][w] = max(knap[i-1][w],knap[i-1][w-wt[i-1]]+val[i-1]);
+            else
+                knap[i][w]=knap[i-1][w];
+        }
+
+    return knap[n][W];
+}
+
+int main()
+{
+    int val[] = {60, 100, 120};
+    int wt[] = {10, 20, 30};
+    int  W = 50;
+    int n = sizeof(val)/sizeof(val[0]);
+    printf("%d", knapSack(W, wt, val, n));
+    
+    return 0;
+}
+#include<stdio.h>
+
+class Subset
+{
+public:
+    int rank;
+    int par;
+};
+
+
+class Edge
+{
+    public:
+    int src;
+    int dest;
+    int weight;
+};
+
+class Graph
+{
+    public:
+    int V,E;
+    Edge *edge;
+    Graph(int v,int e){V=v,E=e,edge = new Edge[E];};
+};
+
+
+void swap(Edge *a,Edge *b)
+{
+    Edge temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int partition(Graph *graph,int low,int high)
+{
+    int k=low,pivot = graph->edge[high].weight;
+    for(int i=low;i<high;i++)
+        if(graph->edge[i].weight<=graph->edge[high].weight)
+            swap(&graph->edge[i],&graph->edge[k++]);
+
+    swap(&graph->edge[k],&graph->edge[high]);
+    return k;
+}
+
+void qsort(Graph *graph,int low,int high)
+{
+    if(low<high)
+    {
+        int piv = partition(graph,low,high);
+        qsort(graph,low,piv-1);
+        qsort(graph,piv+1,high);
+    }
+}
+
+int find(Subset subset[],int i)
+{
+//    printf("finding i is %d \n",i);
+    if(subset[i].par==i)
+        return i;
+
+    return find(subset,subset[i].par);
+}
+
+void Union(Subset subset[],int i,int j)
+{
+    int pari = find(subset,i);
+    int parj = find(subset,j);
+
+    if(subset[pari].rank<subset[parj].rank)
+        subset[pari].par = parj;
+    else if(subset[pari].rank>subset[parj].rank)
+        subset[parj].par = pari;
+    else
+        subset[pari].par = parj,subset[parj].rank++;
+}
+
+void KruskalMST(Graph *graph,int V,int E)
+{
+    Subset subset[V];
+    for(int i=0;i<V;i++)
+        subset[i].par = i,subset[i].rank = 0;
+
+    qsort(graph,0,E-1);
+    for(int i=0;i<E;i++)
+    {
+        //printf("foring\n");
+        int pars = find(subset,graph->edge[i].src);
+        int pard = find(subset,graph->edge[i].dest);
+        //printf("find fine\n");
+        if(pars==pard)
+            continue;
+
+        //printf("e\n");
+        printf("%d %d %d\n",graph->edge[i].src,graph->edge[i].dest,graph->edge[i].weight);
+        Union(subset,graph->edge[i].src,graph->edge[i].dest);
+        //printf("printing subset\n");
+        //for(int i=0;i<V;i++)
+            //printf("%d %d\n",subset[i].par,subset[i].rank);
+    }
+
+}
+
+int main()
+{
+    /* Let us create following weighted graph
+    10
+    0--------1
+    |  \     |
+    6|   5\   |15
+    |      \ |
+    2--------3
+    4       */
+    int V = 4;  // Number of vertices in graph
+    int E = 5;  // Number of edges in graph
+    struct Graph graph(V, E);
+
+
+    // add edge 0-1
+    graph.edge[0].src = 0;
+    graph.edge[0].dest = 3;
+    graph.edge[0].weight = 5;
+
+    // add edge 0-2
+    graph.edge[1].src = 0;
+    graph.edge[1].dest = 2;
+    graph.edge[1].weight = 6;
+
+    // add edge 0-3
+    graph.edge[2].src = 0;
+    graph.edge[2].dest = 1;
+    graph.edge[2].weight = 10;
+
+    // add edge 1-3
+    graph.edge[3].src = 1;
+    graph.edge[3].dest = 3;
+    graph.edge[3].weight = 15;
+
+    // add edge 2-3
+    graph.edge[4].src = 2;
+    graph.edge[4].dest = 3;
+    graph.edge[4].weight = 4;
+
+    KruskalMST(&graph, V, E);
+
+    return 0;
+}
+#include<stdio.h>
+
+class Node
+{
+    public:
+    int data;
+    Node *left;
+    Node *right;
+    Node(int val){left=NULL;right=NULL;data=val;};
+};
+
+Node *lca(Node *root,int n1,int n2)
+{
+    if(root==NULL)
+        return NULL;
+    if(n1<root->data and n2<root->data)
+        return lca(root->left,n1,n2);
+    if(n1>root->data and n2>root->data)
+        return lca(root->right,n1,n2);
+    return root;
+}
+
+int minElement(Node *root)
+{
+    while(root->left)
+    {
+        root = root->left;
+    }
+    return root->data;
+}
+
+Node *insert(Node *root,int key)
+{
+    if(root==NULL)
+    {
+        root = new Node(key);
+        return root;
+    }
+
+    if(key < root->data)
+    {
+        root->left =  insert(root->left,key);
+    }
+
+    if(key > root->data)
+    {
+        root->right = insert(root->right,key);
+    }
+    return root;
+}
+
+Node *deleteNode(Node *root,int key)
+{
+    if(root==NULL)
+        return NULL;
+    printf("deleteing in root %d\n",root->data);
+    if(root->data>key)
+    {root =  deleteNode(root->left,key);return root;}
+    if(root->data<key)
+    {root = deleteNode(root->right,key);return root;}
+    Node *cur = root->right;
+    if(cur==NULL)
+        return root->left;
+
+    printf("cur %d\n",cur->data);
+    while(cur->left)
+    {cur = cur->left;}
+
+    root->data = cur->data;
+    cur=NULL;
+    return root;
+}
+
+void inorder(Node *root)
+{
+    if(root==NULL)
+        return;
+    inorder(root->left);
+    printf("%d ",root->data);
+    inorder(root->right);
+}
+
+/* Driver program to test lca() */
+int main()
+{
+    Node *root = insert(root, 50);
+    root = insert(root, 30);
+    root = insert(root, 20);
+    root = insert(root, 40);
+    root = insert(root, 70);
+    root = insert(root, 60);
+    root = insert(root, 80);
+
+    printf("Inorder traversal of the given tree \n");
+    inorder(root);
+
+    printf("\nDelete 20\n");
+    root = deleteNode(root, 20);
+    printf("Inorder traversal of the modified tree \n");
+    inorder(root);
+
+    printf("\nDelete 30\n");
+    root = deleteNode(root, 30);
+    printf("Inorder traversal of the modified tree \n");
+    inorder(root);
+
+    printf("\nDelete 50\n");
+    root = deleteNode(root, 50);
+    printf("Inorder traversal of the modified tree \n");
+    inorder(root);
+
+    return 1;
+    // Let us construct the BST shown in the above figure
+    Node *root2        = new Node(20);
+    root2->left               = new Node(8);
+    root2->right              = new Node(22);
+    root2->left->left         = new Node(4);
+    root2->left->right        = new Node(12);
+    root2->left->right->left  = new Node(10);
+    root2->left->right->right = new Node(14);
+
+    Node *root1 = insert(NULL,20);
+    insert(root1,8);
+    insert(root1,22);
+    insert(root1,4);
+    insert(root1,12);
+    insert(root1,10);
+    insert(root1,14);
+
+
+    int n1 = 10, n2 = 14;
+    Node *t = lca(root1, n1, n2);
+    printf("LCA of %d and %d is %d \n", n1, n2, t->data);
+
+    n1 = 14, n2 = 8;
+    t = lca(root1, n1, n2);
+    printf("LCA of %d and %d is %d \n", n1, n2, t->data);
+
+    n1 = 10, n2 = 22;
+    t = lca(root1, n1, n2);
+    printf("LCA of %d and %d is %d \n", n1, n2, t->data);
+
+    printf("%d\n",minElement(root));
+    return 0;
+}
+#include<stdio.h>
+#include<cstring>
+
+int max(int i,int j)
+{return i>j?i:j;}
+
+int lcs(char X[], char Y[], int m,int n)
+{
+    int LCS[m][n];
+    for(int i=0;i<=m;i++)
+        for(int j=0;j<=n;j++)
+        {
+            if(i==0 or j==0)
+                LCS[i][j] = 0;
+            else if(X[i-1]==Y[j-1])
+                LCS[i][j] = 1 + LCS[i-1][j-1];
+            else
+                LCS[i][j] = max(LCS[i][j-1],LCS[i-1][j]);
+        }
+
+
+    int i=m,j=n;
+    while(i and j)
+        {
+            if(LCS[i][j]==LCS[i-1][j-1]+1)
+            {
+                printf("%c",X[i-1]);
+                i--;j--;
+            }
+            else
+            {
+                if(LCS[i-1][j]>LCS[i][j-1])
+                    i--;
+                else
+                    j--;
+            }
+        }
+
+    return LCS[m][n];
+
+}
+
+/* Driver program to test above function */
+int main()
+{
+    char X1[] = "AGGTAB";
+    char Y1[] = "GXTXAYB";
+    char X[] = "OldSite:GeeksforGeeks.org";
+    char Y[] = "NewSite:GeeksQuiz.com";
+
+    int m = strlen(X);
+    int n = strlen(Y);
+
+    printf("\nLength of LCS is %d\n", lcs( X, Y, m, n ) );
+
+    return 0;
+}
+#include<stdio.h>
+#include<limits.h>
+
+int max(int a,int b)
+{return a>b?a:b;}
+
+int lis(int arr[],int n)
+{
+    int dp[n+1];
+    for(int i=0;i<n;i++)
+        dp[i]=1;
+
+    for(int i=0;i<n;i++)
+        for(int j=0;j<i;j++)
+        {
+            if(arr[j]<arr[i])
+                dp[i] = max(dp[i],dp[j]+1);
+        }
+
+    int maxi = INT_MIN;
+    for(int i=0;i<n;i++)
+        maxi = max(dp[i],maxi);
+
+    return maxi;
+
+}
+
+/* Driver program to test above function */
+int main()
+{
+    int arr[] = { 10, 22, 9, 33, 21, 50, 41, 60 };
+    int n = sizeof(arr)/sizeof(arr[0]);
+    printf("Length of lis is %d\n",
+    lis( arr, n ));
+    return 0;
+}
+#include<stdio.h>
+using namespace std;
+
+class Node
+{
+public:
+    Node *next;
+    int data;
+};
+
+void reversell(Node **head)
+{
+    if(*head==NULL)
+        return;
+
+    Node *cur = *head;
+    Node *next = (*head)->next;
+    Node *prev=NULL;
+
+    while(cur)
+    {
+        next = cur->next;
+        cur->next = prev;
+
+        prev = cur;
+        cur = next;
+    }
+
+    *head=prev;
+}
+
+void push(Node **head,int data)
+{
+    Node *newNode=new Node;
+    newNode->next = (*head);
+    newNode->data = data;
+
+    *head = newNode;
+}
+
+void printList(Node *head)
+{
+    Node *cur = head;
+    while(cur)
+    {
+        printf("%d->",cur->data);
+        cur = cur->next;
+    }
+    printf("\n");
+}
+
+Node  *merge(Node *a,Node *b)
+{
+    Node *cur=new Node;
+
+    Node *cur1 = a,*cur2 = b;
+
+    if(a==NULL)
+        return b;
+    else if(b==NULL)
+        return a;
+
+        if(cur1->data<=cur2->data)
+        {
+            cur->data = cur1->data;
+            cur->next = merge(a->next,b);
+        }
+        else
+        {
+            cur->data = cur2->data;
+            cur->next = merge(a,b->next);
+        }
+
+        return cur;
+
+}
+
+//root(p) stores address of node a and b(pp) store address of pointers(address).
+//a
+//slow = j a = k
+//*a = value in slow/root
+
+void split(Node *root,Node **a,Node **b)
+{
+    Node *slow;
+    Node *fast;
+    
+    if(root ==NULL or root->next==NULL)
+    {
+        *a=root;
+        *b=NULL;
+        return;
+    }
+    
+    slow = root;
+    fast = root->next;
+
+    while(fast)
+    {
+        fast = fast->next;
+        if(fast)
+        {
+            slow = slow->next;
+            fast=fast->next;
+        }
+    }
+    
+    //*a and *b is the location of address it stored
+    *a = root;
+    //the place that a points to has value - 
+    *b = (slow->next);
+    slow->next = NULL;
+    
+}
+
+void mergeSort(Node **root)
+{
+    Node *a,*b;
+    if(*root==NULL or (*root)->next==NULL)
+        return;
+    
+    // passing address of pointers
+    split(*root,&a,&b);
+    mergeSort(&a);
+    mergeSort(&b);
+
+    *root = merge(a,b);
+}
+int main()
+{
+/* Start with the empty list */
+    Node* head = NULL;
+    
+    push(&head, 20);
+    push(&head, 4);
+    push(&head, 15); 
+    push(&head, 85);      
+    
+    printf("Given linked list\n");
+    printList(head);    
+    mergeSort(&head);                      
+    printf("\nReversed Linked list \n");
+    printList(head);    
+}
+#include<stdio.h>
+#include<cstring>
+
+int max(int a,int b)
+{return a>b?a:b;}
+
+int lps(char seq[])
+{
+    int n =strlen(seq);
+    int dp[n+1][n+1];
+
+    for(int l=1;l<=n;l++)
+    {
+        for(int st=0;st+l-1<n;st++)
+        {
+            int ed = st+l-1;
+            if(st==ed)
+                dp[st][ed] = 1;
+
+            else if(seq[st]==seq[ed])
+                dp[st][ed] = dp[st+1][ed-1]+2;
+
+            else
+                dp[st][ed] = max(dp[st][ed-1],dp[st+1][ed]);
+        }
+    }
+
+    int st=0,ed=n-1;
+    char palin[dp[0][n-1]];
+    int i=0;
+    for(int i=0;i<n;i++)
+    {
+        for(int j=0;j<n;j++)
+            printf("%d ",dp[i][j]);
+        printf("\n");
+    }
+
+    return dp[0][n-1];
+    while(ed-st>=0)
+    {
+        printf("%d %d\n",st,ed);
+        if(dp[st][ed] == dp[st+1][ed-1]+2)
+        {
+            palin[i++]=seq[st];
+            printf("%d %c\n",st,seq[st]);
+            //palin[ed]=seq[st];
+            st++;ed--;
+        }
+        else if(dp[st][ed-1]==dp[st][ed])
+        {
+            ed--;
+        }
+        else
+            st++;
+    }
+    return dp[0][n-1];
+}
+
+//BABCBAB
+
+int main()
+{
+    char seq[] = "BBABCBCAB";//"GEEKS FOR GEEKS";
+    int n = strlen(seq);
+    printf ("The lnegth of the LPS is %d", lps(seq));
+    return 0;
+}
+#include<stdio.h>
+#include<limits.h>
+
+int min(int a,int b)
+{
+    return a<b?a:b;
+}
+
+int MatrixChainOrder(int arr[],int n){
+    int matrix[n][n];
+    for(int i=0;i<n;i++) matrix[i][i]=0;
+    
+    for(int link=2;link<n;link++)
+    {
+        for(int i=1;i+link-1<n;i++)
+        {
+            int j = i+link-1;
+            matrix[i][j] = INT_MAX;
+            for(int k=i;k<j;k++)
+            {
+                matrix[i][j] = min(matrix[i][j],matrix[i][k] + matrix[k+1][j] + arr[i-1]*arr[k]*arr[j]);
+            }
+        }
+    }
+    return matrix[1][n-1];
+}
+
+int main()
+{
+    int arr[] = {1, 2, 3, 4};
+    int size = sizeof(arr)/sizeof(arr[0]);
+    
+    printf("Minimum number of Multiplications is %d ",
+    MatrixChainOrder(arr, size));
+    
+    getchar();
+    return 0;
+}
+#include<stdio.h>
+
+int min(int i,int j)
+{
+    return i<j?i:j;
+}
+
+int minCost(int *arr,int r,int c)
+{
+    int cost[r][c];
+
+    for(int i=0;i<r;i++)
+        for(int j=0;j<c;j++)
+            {
+                if(i==0 and j==0)
+                    cost[i][j] = *((arr+i*c)+j);
+                else if(i==0)
+                    cost[i][j] = *((arr+i*c)+j) + cost[i][j-1];
+                else if(j==0)
+                    cost[i][j] = *((arr+i*c)+j) + cost[i-1][j];
+                else    
+                    cost[i][j] = *((arr+i*c)+j) + min(cost[i-1][j],cost[i-1][j-1]);
+            //printf("%d\n",cost[i][j]);
+            }
+
+    return cost[r-1][c-1];
+}
+
+int main()
+{
+    int R=3,C = 3;
+    int cost[R][C] = { {1, 2, 3},
+    {4, 8, 2},
+    {1, 5, 3} };
+    printf(" %d ", minCost(*cost, R, C));
+    return 0;
+}
+#include <stdio.h>
+#define n 4
+
+int abs(int n)
+{
+    return n>0?n:-n;
+}
+
+bool isSafe(int grid[n][n],int cur)
+{
+    for(int i=0;i<n;i++)
+        if(grid[i][cur%n])
+            return false;
+
+    for(int j=0;j<n;j++)
+        if(grid[cur/N][j])
+            return false;
+
+    for(int i=0;i<)
+}
+
+bool nqueensUtil(grid,cur)
+{
+
+}
+
+void nqueens()
+{
+   int grid[n][n];
+   for(int i=0;i<n;i++)
+      for(int j=0;j<n;j++)
+         grid[i][j] = 0;
+
+    if(nqueensUtil(grid,cur))
+    {
+        for(int i=0;i<n;i++)
+            for(int j=0;j<n;j++)
+                printf("%d ",grid[i][j]);
+        printf("\n");
+        return;
+    }
+
+    printf("NOSO!\n");
+
+}
+
+int main()
+{
+    nqueens();
+    return 0;
+}
+#include<stdio.h>
+
+void swap(int &a, int &b)
+{
+    int c=a;
+    a=b;
+    b=c;
+}
+
+void printArr(int arr[], int n)
+{
+    for(int i=0;i<n;i++)
+        printf("%d ", arr[i]);
+}
+
+int partition(int arr[],int st,int ed)
+{
+    int p=ed;
+
+    for(int i=st;i<ed;i++)
+    {
+    }
+}
+
+void qsort(int arr[], int st, int ed)
+{
+    if(st<ed)
+    {
+        int p = partition(arr, st, ed);
+        qsort(arr, st, p-1);
+        qsort(arr, p+1, ed);
+    }
+}
+
+int main()
+{
+    int arr[] = {2,3,1,6,2,7,343,1,3,2};
+    int a=1,b=2;
+    swap(a,b);
+    printf("%d %d\n",a,b);
+
+    //qsort(arr,sizeof(arr)/sizeof(int));
+    printArr(arr,sizeof(arr)/sizeof(int));
+}
+#include<stdio.h>
+
+bool findPartition(int arr[],int n)
+{
+    int sum=0;
+    for(int i=0;i<n;i++)
+        sum+=arr[i];
+
+    if(sum&1)
+        return false;
+
+    bool dp[sum+1][n+1];
+    for(int s=0;s<=sum/2;s++)
+    {
+        dp[s][0]=0;
+        for(int i=1;i<=n;i++)
+        {
+            if(i==s)
+                dp[s][i] = true;
+            else if(s<i)
+                dp[s][i] = dp[s][i-1];
+            else
+                dp[s][i] = dp[s][i-1] or dp[s-arr[i-1]][i-1];
+
+        }
+    }
+
+
+    return dp[sum/2][n+1];
+}
+
+int main()
+{
+    int arr[] = {3, 1, 5, 9, 12};
+    int n = sizeof(arr)/sizeof(arr[0]);
+    if (findPartition(arr, n) == true)
+        printf("Can be divided into two subsets of equal sum");
+    else
+    printf("Can not be divided into two subsets of equal sum");
+    return 0;
+}
+#include<stdio.h>
+#include<iostream>
+using namespace std;
+
+class Graph
+{
+    int V;
+    int *arr;
+public:
+    Graph(int v);
+    void addEdge(int u,int v,int w);
+    void printGraph();
+    bool pathMoreThanK(int src,int k); 
+    bool pathMoreThanKUtil(int src,int k,int path[]);
+};
+
+Graph::Graph(int v)
+{
+    V = v;
+    arr = new int[v*v];
+
+    for(int i=0;i<V;i++)
+        for(int j=0;j<V;j++)
+            arr[i*V+j] = -1;
+
+}
+
+void Graph::addEdge(int u,int v,int w)
+{
+    arr[u*V+v] = w;
+    arr[v*V+u] = w;
+}
+
+void Graph::printGraph()
+{
+
+    for(int i=0;i<V;i++)
+    {
+        printf("%d-",i);
+        for(int j=0;j<V;j++)
+            printf("%d ",arr[i*V+j]);
+        printf("\n");
+    }
+}
+
+bool Graph:: pathMoreThanKUtil(int src,int k,int path[])
+{
+    if(k<0)
+        return true;
+
+    for(int i=0;i<V;i++)
+    {
+        int child = src*V+i;
+
+        if(arr[child]==-1 or path[i])
+            continue;
+
+        int cur_wt = arr[child];
+
+        
+        path[i]=1;
+        if(pathMoreThanKUtil(i,k-cur_wt,path))
+            return true;
+
+        path[i]=0;
+    }
+    
+    return false;
+}
+
+bool Graph:: pathMoreThanK(int src,int k)
+{
+    int path[V];
+    for(int i=0;i<V;i++)
+        path[i] = 0;
+    
+    path[src] = 1;
+    return (pathMoreThanKUtil(src,k,path));
+}
+
+
+int main()
+{
+        // create the graph given in above fugure
+    int V = 9;
+    Graph g(V);
+    
+    //  making above shown graph
+    g.addEdge(0, 1, 4);
+    g.addEdge(0, 7, 8);
+    g.addEdge(1, 2, 8);
+    g.addEdge(1, 7, 11);
+    g.addEdge(2, 3, 7);
+    g.addEdge(2, 8, 2);
+    g.addEdge(2, 5, 4);
+    g.addEdge(3, 4, 9);
+    g.addEdge(3, 5, 14);
+    g.addEdge(4, 5, 10);
+    g.addEdge(5, 6, 2);
+    g.addEdge(6, 7, 1);
+    g.addEdge(6, 8, 6);
+    g.addEdge(7, 8, 7);
+    g.printGraph();
+
+    int src = 0;
+    int k = 62;
+    g.pathMoreThanK(src, k)? cout << "Yes\n" :
+    cout << "No\n";
+
+    k = 60;
+    g.pathMoreThanK(src, k)? cout << "Yes\n" :
+    cout << "No\n";
+
+    return 0;
+}
+#include <stdio.h>
+
+void swap(char *a,char *b)
+{
+    char temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void permute(char str[],int left,int right)
+{
+    if(left>=right)
+        return;
+
+    permute(str,left+1,right);
+    for(int i=left+1;i<=right;i++)
+    {
+        swap(&str[i],&str[left]);
+    printf("%s\n",str);
+        permute(str,left+1,right);
+        swap(&str[i],&str[left]);
+    }
+}
+
+int main()
+{
+    char str[] = "ABCD";
+    int n = int(sizeof(str)-1);
+    //printf("%s\n",str);
+    permute(str, 0, n-1);
+    return 0;
+}
+#include<stdio.h>
+#include<limits.h>
+#define V 5
+
+int minKeyIndex(int key[],int visited[])
+{
+    int ind=-1,mini=INT_MAX;
+    for(int v=0;v<V;v++)
+    {
+        if(not visited[v] and key[v]<mini)
+            ind=v,mini = key[v];
+    }
+
+    return ind;
+}
+
+void primMST(int graph[V][V])
+{
+    int visited[V],key[V],par[V];
+    for (int i=0;i<V;i++)
+        visited[i] = 0,key[i]=INT_MAX;
+
+    key[0]=0;
+    visited[0]=1;
+    par[0]=-1;
+
+    int count=V,minInd=0;
+    while(V>=0 and --count)
+    {
+
+        for(int i=0;i<V;i++)
+        {
+            if(not visited[i] and graph[minInd][i] and key[i]>graph[minInd][i])
+                key[i]=graph[minInd][i],par[i]=minInd;
+        }
+
+        minInd = minKeyIndex(key,visited);
+        visited[minInd] = 1;
+
+    }
+    for(int i=0;i<V;i++)
+    {
+        printf("%d %d         wt=%d\n",i,par[i],graph[i][par[i]]);
+    }
+}
+
+// driver program to test above function
+int main()
+{
+       /* Let us create the following graph
+                    2    3
+    (0)--(1)--(2)
+    |   / \   |
+    6| 8/   \5 |7
+    | /     \ |
+    (3)-------(4)
+    9          */
+    int graph[V][V] = {{0, 2, 0, 6, 0},
+                        {2, 0, 3, 8, 5},
+                        {0, 3, 0, 0, 7},
+                        {6, 8, 0, 0, 9},
+                        {0, 5, 7, 9, 0},
+                        };
+
+    // Print the solution
+    primMST(graph);
+
+    return 0;
+}
+#include<stdio.h>
+using namespace std;
+
+class Queue
+{
+    int front,rear, size;
+    int *array;
+    int capacity;
+public:
+    Queue(int capacity);
+    bool isFull();
+    bool isEmpty();
+    void enqueue(int item);
+    int dequeue();
+    int Front();
+    int Rear();
+
+};
+Queue::Queue(int cap)
+{
+    capacity = cap;
+    front = size = 0;
+    rear = capacity-1;
+    array = new int[capacity];
+}
+
+bool Queue::isFull()
+{
+    return size==capacity;
+}
+
+bool Queue::isEmpty()
+{
+    return not size;
+}
+
+void Queue::enqueue(int item)
+{
+    if(isFull())
+        return;
+    size++;
+    ++rear%=capacity;
+    array[rear] = item;
+}
+
+int Queue::dequeue()
+{
+    if(isEmpty())
+        return -1;
+    size--;
+    int item = array[front];
+    ++front%=capacity;
+    return item;
+}
+
+int Queue::Front()
+{
+    if(isEmpty())
+        return -1;
+    return array[front];
+}
+
+int Queue::Rear()
+{
+    if(isEmpty())
+        return -1;
+    return array[rear];
+}
+
+int main()
+{
+    Queue queue(1000);
+    
+    queue.enqueue(10);
+    queue.enqueue(20);
+    queue.enqueue(30);
+    queue.enqueue(40);
+    
+    printf("%d dequeued from queue\n", queue.dequeue());
+    
+    printf("Front item is %d\n", queue.Front());
+    printf("Rear item is %d\n", queue.Rear());
+    
+    return 0;
+}
+#include<stdio.h>
+using namespace std;
+
+class tNode
+{
+public:
+    int data;
+    tNode *left,*right;
+    tNode(){left=right=NULL;}
+};
+
+class Node
+{
+public:
+    tNode *tnode;
+    Node *next;
+};
+
+class Queue
+{
+    Node *rear,*front;
+public:
+    Queue(){rear=NULL,front=NULL;}
+    void Enqueue(tNode *root);
+    tNode *Dequeue();
+    
+};
+
+void Queue::Enqueue(tNode *root)
+{
+    Node *temp = new Node;
+    temp->next = NULL;
+    temp->tnode = root;
+    
+    if(rear==NULL)
+    {
+        rear  = new Node;
+        rear->next = NULL;
+        rear->tnode=root;
+        front = rear;
+        return;
+    }
+    rear->next = temp;
+    rear = rear->next;
+};
+
+tNode *Queue::Dequeue()
+{
+    if(front==NULL)
+        return NULL;
+
+    tNode *temp = front->tnode;
+    front = front->next;
+    
+    if(front==NULL)
+        rear=NULL;
+    return temp;
+};
+
+int main()
+{
+    Queue q;
+    tNode *root = new tNode;
+    root->data = 10;
+    q.Enqueue(root);
+    root = new tNode;
+    root->data = 20;
+    q.Enqueue(root);
+    q.Dequeue();
+    q.Dequeue();
+    root = new tNode;
+    root->data = 30;
+    q.Enqueue(root);
+    root = new tNode;
+    root->data = 40;
+    q.Enqueue(root);
+    root = new tNode;
+    root->data = 50;
+    q.Enqueue(root);
+    tNode *n = q.Dequeue();
+
+    if (n != NULL)
+    printf("Dequeued item is %d", n->data);
+    return 0;
+}
+#include<stdio.h>
+#include<stdio.h>
+#define N 4
+
+
+bool solving(int maze[N][N], int par[N*N],int cur)
+{
+    if(cur==N*N-1)
+        return true;
+    if(cur>=N*N)
+        return false;
+
+    if(not maze[cur/N][cur%N])
+        return false;
+    
+    if((cur+N)<N*N)
+    {
+        par[cur+N]=cur;
+        if(solving(maze,par,cur+N))
+        {
+            printf("%d %d %d is true\n",cur+N,(cur+N)/N,(cur+N)%N);
+            return true;
+        }
+        par[cur+N]=-1;
+
+    }
+    if((cur+1)%N)
+    {
+        par[cur+1]=cur;
+        if(solving(maze,par,cur+1))
+        {
+            printf("%d %d %d is true\n",cur+1,(cur+1)/N,(cur+1)%N);
+            return true;
+        }
+        par[cur+1]=-1;
+    }
+
+    return false;
+}
+
+void solveMaze(int maze[N][N])
+{
+    int par[N*N];
+    for(int i=0;i<N*N;i++)
+        par[i] = -1;
+
+    par[0]=0;
+    if(solving(maze,par,0))
+    {
+        for(int i=0;i<N;i++)
+            for(int j=0;j<N;j++)
+                maze[i][j] = 0;
+
+        int p = par[N*N-1];
+        while(p)
+        {
+            maze[p/N][p%N] = 1;
+            p = par[p];
+        }
+        maze[0][0] = 1;
+
+        for(int i=0;i<N;i++)
+        {
+            for(int j=0;j<N;j++)
+                printf("%d ",maze[i][j]);
+
+            printf("\n");
+        }
+    }
+    else
+        printf("No Solution\n");
+}
+
+
+// driver program to test above function
+int main()
+{
+    int maze[N][N]  =  { {1, 0, 0, 0},
+                         {1, 1, 0, 1},
+                         {0, 1, 0, 0},
+                         {1, 1, 1, 1}
+                         };
+
+solveMaze(maze);
+return 0;
+}
+#include<stdio.h>
+#include<limits.h>
+using namespace std;
+
+void swap(int *a,int *b)
+{
+    int temp=*a;
+    *a = *b;
+    *b = temp;
+}
+
+void printArray(int arr[],int n)
+{
+    for(int i=0;i<n;i++)
+        printf("%d ",arr[i]);
+    printf("\n");
+}
+
+void selectionSort(int arr[],int n)
+{
+    int min=INT_MAX,ind;
+   for(int i=0;i<n;i++)
+   {
+       min = arr[i];
+       for(int j=i;j<n;j++)
+       {
+
+           if(min>=arr[j])
+               min=arr[j],ind=j;
+       }
+       swap(&arr[i],&arr[ind]);
+   }
+}
+
+void bubbleSort(int arr[],int n)
+{
+    int i=0;
+    int swapped=0;
+    if(n<2)
+        return;
+
+    do
+    {
+        swapped = 0;
+        for(int i=0;i<n-1;i++)
+            if(arr[i]>arr[i+1])
+                swap(&arr[i],&arr[i+1]),swapped=1;
+    }
+    while(swapped);
+}
+
+void insertionSort(int arr[],int n)
+{
+    for(int i=1;i<n;i++)
+    {
+        int j = i-1;
+        int key = arr[i];
+
+        while(j>=0 and arr[j]>key)
+        {
+            arr[j+1]=arr[j];
+            j--;
+        }
+        
+        arr[j+1]=key;
+    }
+}
+
+void merge(int arr[],int l,int m,int r)
+{
+    int n1 = m-l+1,n2 = r-m;
+    int arr1[n1],arr2[n2];
+    int k=0;
+
+    for(int i=0;i<n1;i++)
+        arr1[k++]=arr[i+l];
+    
+    k=0;
+    for(int i=0;i<n2;i++)
+        arr2[k++]=arr[m+1+i];
+    
+    int i=0,j=0;
+    k=l;
+
+    while(i<n1 and j<n2)
+    {
+        if(arr[i]<arr[j])
+            arr[k++]=arr1[i++];
+        else
+            arr[k++]=arr2[j++];
+    }
+
+    while(i<n1)
+        arr[k++] = arr1[i++];
+
+    while(i<n2)
+        arr[k++] = arr2[j++];
+
+}
+
+void mergeSort(int arr[],int l,int r)
+{
+    if(l<r)
+    {
+         mergeSort(arr,l,(l+r)/2);
+         mergeSort(arr,(l+r)/2+1,r);
+         merge(arr,l,(r+l)/2,r);
+
+    }
+}
+
+int partition(int arr[],int l,int r)
+{
+    int pivot = arr[r];
+    int i=l;
+
+    for(int j=l;j<r;j++)
+    {
+        if(arr[j]<=pivot)
+            swap(&arr[j],&arr[i++]);
+        
+    }
+    swap(&arr[i],&arr[r]);
+    return i;
+}
+
+void quickSort(int arr[],int l,int r)
+{
+    if(l<r)
+    {
+        int piv = partition(arr, l,r);
+        quickSort(arr,l,piv-1);
+        quickSort(arr,piv+1,r);
+    }
+}
+
+void heapify(int arr[],int n,int i)
+{
+    int largest = i;
+    int left = 2*i+1;
+    int right = 2*i+2;
+
+    if(left<n and arr[largest]<arr[left])
+        largest = left;
+    if(right<n and arr[largest]<arr[right])
+        largest =right;
+
+    if(largest != i)
+    {
+        swap(&arr[largest],&arr[i]);
+        heapify(arr,n,largest);
+    }
+}
+
+void heapSort(int arr[],int n)
+{
+    for(int i=n/2-1;i>=0;i--)
+        heapify(arr,n,i);
+
+    for(int i=n-1;i>=0;i--)
+    {
+        swap(&arr[0],&arr[i]);
+        heapify(arr,i,0);
+    }
+}
+
+int main()
+{
+    int arr[] = {64, 25, 12, 22, 11};
+    int n = sizeof(arr)/sizeof(arr[0]);
+    heapSort(arr, n);
+    printf("Sorted array: \n");
+    printArray(arr, n);
+    return 0;
+}
+#include<stdio.h>
+#include<string.h>
+using namespace std;
+
+class Stack
+{
+public:
+    int N;
+    int top;
+    char *array;
+    Stack(int N);
+    void push(char e);
+    char pop();
+    char peek();
+    int isEmpty();
+};
+
+Stack::Stack(int n)
+{
+    this->top = 0;
+    this->N = n;
+    this->array = new char[n];
+};
+
+void Stack::push(char e)
+{
+    this->array[this->top++]=e;
+}
+char Stack::pop()
+{
+    return this->array[--top];
+};
+
+char Stack::peek()
+{
+    return this->array[top-1];
+};
+
+int Stack::isEmpty()
+{
+    return not this->top;
+}
+
+int prec(char ch)
+{
+    switch(ch)
+    {
+        case '+':
+        case '-':
+            return 1;
+        case '*':
+        case '/':
+            return 2;
+        case '^':
+            return 3;
+    }
+    return -1;
+}
+
+int isOperand(char e)
+{
+    return (e>='a' and e<='z') or (e>='A' and e<='Z');
+}
+
+int infix2Postfix(char *exp)
+{
+    Stack stack(strlen(exp));
+    int i,k;
+    for(i=0,k=0;i<strlen(exp);i++)
+    {
+
+       if(isOperand(exp[i]))
+       {
+            exp[k++]=exp[i];
+       }
+       else if(exp[i]!='(' and exp[i]!=')')
+        {
+            while(not stack.isEmpty() and prec(exp[i])<=prec(stack.peek()))
+                exp[k++] = stack.pop();
+            stack.push(exp[i]);
+        }
+       else if(exp[i]=='(')
+           stack.push(exp[i]);
+
+       else if(exp[i]==')')
+       {
+           while(!stack.isEmpty() and stack.peek()!='(')
+           {
+            exp[k++] = stack.pop();
+           }
+
+           stack.pop();
+       }
+       
+    }    
+     
+    while(!stack.isEmpty())
+        exp[k++]=stack.pop();
+
+    exp[k++]='\0'; 
+    printf("Final expression - %s",exp);
+}
+
+int main()
+{
+    char exp[] = "a+b*(c^d-e)^(f+g*h)-i";
+    infix2Postfix(exp);
+   
+    return 0;
+}
+#include<stdio.h>
+using namespace std;
+
+class Stack
+{
+    int capacity;
+    int cur;
+    char *array;
+public:
+    Stack(int n);
+    char pop();
+    bool isEmpty();
+    void push(char c);
+    char peek();
+};
+
+Stack::Stack(int cap)
+{
+    capacity = cap;
+    array = new char[cap];
+    cur=0;
+};
+
+char Stack::pop()
+{
+    return array[--cur];
+};
+
+char Stack::peek()
+{
+    return array[cur-1];
+}
+void Stack::push(char c)
+{
+    array[cur++]=c;
+}
+
+bool Stack::isEmpty()
+{
+    return not cur;
+}
+
+bool isOperand(char c)
+{
+    return ('z'>=c and c>='a') or ('Z'>=c and c>='A');        
+}
+
+
+int prec(char c)
+{
+    switch (c)
+    {
+        case '+':
+        case '-':
+            return 1;
+
+        case '*':
+        case '/':
+            return 2;
+
+        case '^':
+            return 3;
+    }
+
+    return -1;
+}
+
+void infixToPostfix(char *exp)
+{
+    int len;
+    for(len=0;exp[len]!='\0';len++);
+
+    Stack stack(len);
+    int i,k;
+
+    for(i=0,k=0;i<len;i++)
+    {
+        if (isOperand(exp[i]))
+            exp[k++]=exp[i];
+        else if (exp[i]=='(')
+        {
+            stack.push('(');
+        }
+        else if (exp[i]==')')
+        {
+            while(!stack.isEmpty() and stack.peek()!='(')
+            {
+                exp[k++]=stack.pop();
+            }
+            stack.pop();
+        }
+        else
+        {
+            while(!stack.isEmpty() and prec(exp[i])<=prec(stack.peek()))
+                exp[k++] = stack.pop();
+            stack.push(exp[i]);
+        }
+    }
+
+    while(!stack.isEmpty())
+        exp[k++] = stack.pop();
+    
+    exp[k]='\0';
+    printf("%s\n",exp);
+}
+
+int isDigit(char exp)
+{
+    return ('9'>=exp and exp>='0');
+}
+
+int evalPostfix(char *exp)
+{
+    int len;
+    for(len = 0; exp[len]!='\0'; len++);
+    Stack dstack(len);
+    
+    for(int i=0;i<len;i++)
+    {
+        if(isDigit(exp[i]))
+            dstack.push(exp[i]-'0');
+
+        else
+        {
+            char last = dstack.pop();
+            char slast = dstack.pop();
+            switch(exp[i])
+            {
+                case '+':
+                    dstack.push(slast+last);
+                    break;
+                case '-':
+                    dstack.push(slast-last);
+                    break;
+                case '*':
+                    dstack.push(slast*last);
+                    break;
+                case '/':
+                    dstack.push(slast/last);
+                    break;
+            }
+        }
+        //printf("%d\n",dstack.peek());
+    }
+    return dstack.pop();
+
+}
+
+main()
+{
+    char exp[] = "231*+9-";
+    printf ("Value of %s is %d\n", exp, evalPostfix(exp));
+    return 0;
+    
+    char exp1[] = "a+b*(c^d-e)^(f+g*h)-i";
+    infixToPostfix(exp1);
+   
+    return 0;
+    Stack stack(5);
+    stack.push('q');
+    stack.push('w');
+    stack.push('e');
+    stack.push('r');
+    stack.push('t');
+    stack.push('y');
+
+    printf("%c\n",stack.pop());
+    printf("%c\n",stack.peek());
+    while(!stack.isEmpty())
+        printf("%c ",stack.pop());
+    return 0;
+}
+#include<stdio.h>
+
+
+void printGrid(int gird[9][9])
+{
+    for(int i=0;i<9;i++)
+    {
+        for(int j=0;j<9;j++)
+            printf("%d ",gird[i][j]);
+        printf("\n");
+    }
+}
+
+bool isSafe(int grid[9][9],int ci,int cj,int val)
+{
+    int bi=ci/3, bj=cj/3;
+
+   //check row
+    for(int i=0;i<9;i++)
+        if(grid[ci][i]==val)
+            return false;
+    //check column
+    for(int i=0;i<9;i++)
+        if(grid[i][cj]==val)
+            return false;
+    //check box
+    for(int i=0;i<3;i++)
+        for(int j=0;j<3;j++)
+        if(grid[3*bi+i][3*bj+j]==val)
+            return false;
+    return true;
+}
+
+bool SolveSudoku(int grid[9][9])
+{
+    bool flag=0;
+    int ci,cj;
+
+    for(int i=0;i<9;i++)
+        for(int j=0;j<9;j++)
+        {
+            if(grid[i][j]==0)
+            {
+                ci=i;
+                cj=j;
+                flag=1;
+            }
+        }
+
+    if(!flag)
+        return true;
+
+    for(int i=1;i<=9;i++)
+    {
+        bool safe = isSafe(grid,ci,cj,i);
+        if(safe)
+        {
+            grid[ci][cj] = i;
+            
+            if(SolveSudoku(grid))
+                return true;
+
+            grid[ci][cj] = 0;
+        }
+
+    }
+
+    return false;
+}
+
+int main()
+{
+        // 0 means unassigned cells
+    
+    int grid[9][9] =   {{3, 0, 6, 5, 0, 8, 4, 0, 0},
+                        {5, 2, 0, 0, 0, 0, 0, 0, 0},
+                        {0, 8, 7, 0, 0, 0, 0, 3, 1},
+                        {0, 0, 3, 0, 1, 0, 0, 8, 0},
+                        {9, 0, 0, 8, 6, 3, 0, 0, 5},
+                        {0, 5, 0, 0, 9, 0, 6, 0, 0},
+                        {1, 3, 0, 0, 0, 0, 2, 5, 0},
+                        {0, 0, 0, 0, 0, 0, 0, 7, 4},
+                        {0, 0, 5, 2, 0, 6, 3, 0, 0}}; 
+   if (SolveSudoku(grid) == true)
+        printGrid(grid);
+    else
+        printf("No solution exists");
+
+    return 0;
+}
+// C++ program to sizes of data types
+#include<iostream>
+#include<stdio.h>
+using namespace std;
+
+bool isSubsetSum(int set[],int n,int sum)
+{
+    int dp[sum+1][n+1];
+    for(int s=0;s<=sum;s++)
+        for(int i=0;i<=n;i++)
+        {
+            if(i==0)
+                dp[s][i] = 0;
+            else if (s==0)
+                dp[s][i] = 1;
+            else if(s>=set[i-1])
+                dp[s][i] = max(dp[s][i-1],dp[s-set[i-1]][i-1]);
+        }
+
+    for(int i=0;i<=n;i++)
+        printf("%d ",dp[sum][i])
+    return dp[sum][n];
+}
+
+int main()
+{
+    int set[] = {3, 5, 10};
+    int sum = 20;
+    int n = sizeof(set)/sizeof(set[0]);
+    printf("%d\n",isSubsetSum(set,n,sum));
+    return 0;
+}
+#include<stdio.h>
+#include<iostream>
+using namespace std;
+
+class Node
+{
+    public:
+        int data;
+        Node *next;
+};
+
+class ll
+{
+    public:
+    Node *head;
+    void push(int data);    
+};
+
+void ll::push(int data)
+{
+    Node *temp = new Node;
+    temp->next = head;
+    temp->data = data;
+    head = temp;
+};
+
+class Stack
+{
+    Node *top;
+    public:
+    Stack(){top=NULL;}
+    void push(int data);
+    int pop();
+    bool isEmpty();
+};
+
+void Stack::push(int data)
+{
+    Node *temp = new Node;
+    (*temp).data = data;
+    (*temp).next = top;
+    top = temp;
+}
+
+int Stack::pop()
+{
+    int ret = (*top).data;
+    top = (*top).next;
+    return ret;
+}
+
+bool Stack::isEmpty()
+{
+    return top==NULL;
+}
+
+class Graph
+{
+    ll *adjList;
+    int N;
+public:
+    Graph(int n);
+    void addEdge(int src,int dest);
+    void topologicalSort();
+    void printGraph();
+    void dfs();
+    void dfsutil(int i, int visited[], Stack *s);
+};
+
+Graph::Graph(int n)
+{
+    N=n; 
+    adjList = new ll [n];
+    for(int i=0;i<N;i++)
+        adjList[i].head = NULL;
+}
+
+void Graph::addEdge(int src,int dest)
+{
+    adjList[src].push(dest);
+};
+
+void Graph::printGraph()
+{
+    for(int i=0;i<N;i++)
+    {
+        Node *cur;
+        cur = adjList[i].head;
+        printf("Adjacency of %d\n",i);
+        
+        while(cur)
+        {
+            printf("%d\n",cur->data);
+            cur = cur->next;
+        }
+    }
+}
+
+
+void Graph::dfsutil(int i, int visited[],Stack *s)
+{
+    
+            Node *cur,*prev=NULL;
+            cur = adjList[i].head;
+
+            visited[i] = 1;
+            
+            printf("%d ",i);
+            
+            while(cur)
+            {
+                if(!visited[cur->data])
+                    dfsutil(cur->data,visited, s);
+                
+                prev = cur;    
+                cur = cur ->next;
+            }
+            
+            (*s).push(i);
+}
+
+void Graph::dfs()
+{
+    printf("Printing dfs\n");
+    int visited[N];
+    for(int i=0;i<N;i++)
+        visited[i] = 0;
+    
+    Stack s;
+    for(int i=0;i<N;i++)
+    {
+        if(!visited[i])
+            dfsutil(i,visited,&s);
+    }
+
+    while(!s.isEmpty())
+        printf("%d-",s.pop());
+}
+
+int main()
+{
+    // Create a graph given in the above diagram
+    Graph g(6);
+    g.addEdge(5, 2);
+    g.addEdge(5, 0);
+    g.addEdge(4, 0);
+    g.addEdge(4, 1);
+    g.addEdge(2, 3);
+    g.addEdge(3, 1);
+    
+    cout << "Following is a Topological Sort of the given graph \n";
+    g.topologicalSort();
+    g.printGraph();   
+    g.dfs();
+    return 0;
+}
+#include<stdio.h>
+using namespace std;
+
+class tNode
+{
+public:
+    tNode *right, *left;
+    int value;
+    tNode(int n);
+};
+
+tNode::tNode(int n)
+{
+    this->value = n;
+    this->left = NULL;
+    this->right = NULL;
+};
+
+class sNode
+{
+public:
+    sNode *next;
+    tNode *tnode;
+};
+
+class Stack
+{
+    sNode *top;
+public:
+    Stack();
+    void push(tNode *root);
+    tNode *pop();
+    bool isEmpty();
+};
+
+Stack::Stack()
+{
+    top=NULL;
+}
+
+void Stack::push(tNode *root)
+{
+    sNode *temp = new sNode;
+    temp->tnode = root;
+    temp->next = top;
+    top = temp;
+};
+
+tNode *Stack::pop()
+{
+    sNode *poped;
+    poped = top;
+    top = top->next;
+    return poped->tnode;
+};
+
+bool Stack::isEmpty()
+{
+    return top==NULL;
+}
+
+void postOrderRec(tNode *root)
+{
+    if(not root)
+        return;
+
+    postOrderRec(root->left);
+    postOrderRec(root->right);
+    printf("%d->",root->value);
+}
+
+void preOrderRec(tNode *root)
+{
+    if(not root)
+        return;
+
+    printf("%d->",root->value);
+    preOrderRec(root->left);
+    preOrderRec(root->right);
+}
+
+void inOrderRec(tNode *root)
+{
+    if(not root)
+        return;
+
+    inOrderRec(root->left);
+    printf("%d->",root->value);
+    inOrderRec(root->right);
+}
+
+void inOrder(tNode *root)
+{
+    if(root==NULL)
+        return;
+    Stack s;
+    s.push(root);
+
+    tNode *cur = root;
+
+    while(!s.isEmpty())
+    {
+        while(cur)
+        {
+            s.push(cur);
+            cur = cur->left;
+        }
+        cur = s.pop();
+        printf("%d-",cur->value);
+        cur = cur->right;
+    }
+
+}
+
+main()
+{
+    tNode *root = new tNode(1);
+    root->left = new tNode(2);
+    root->right = new tNode(3);
+    root->left->left = new tNode(4);
+    root->left->right = new tNode(5);
+    preOrderRec(root);
+    printf("- preOrder \n");
+    inOrderRec(root);
+    printf("- inOrder \n");
+    postOrderRec(root);
+    printf("- postOrder \n");
+    inOrder(root);
+    //Stack s;
+    //s.push(1);
+    //s.push(2);
+    //s.push(3);
+
+    //while(!s.isEmpty())
+    //    printf("%d\n",s.pop());
+}
