@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <cstring>
 #include <algorithm>
 #include <limits.h>
 using namespace std;
@@ -9,34 +10,70 @@ int comp(const void *a,const void *b)
 int abs(int a)
 {return a<0?-a:a;}
 
+int count( int S[], int m, int n )
+{
+    int i, j, x, y;
+ 
+    // We need n+1 rows as the table is consturcted in bottom up manner using 
+    // the base case 0 value case (n = 0)
+    int table[n+1][m];
+    
+    // Fill the enteries for 0 value case (n = 0)
+    for (i=0; i<m; i++)
+        table[0][i] = 1;
+ 
+    // Fill rest of the table enteries in bottom up manner  
+    for (i = 1; i < n+1; i++)
+    {
+        for (j = 0; j < m; j++)
+        {
+            // Count of solutions including S[j]
+            x = (i-S[j] >= 0)? table[i - S[j]][j]: 0;
+ 
+            // Count of solutions excluding S[j]
+            y = (j >= 1)? table[i][j-1]: 0;
+ 
+            // total count
+            table[i][j] = x + y;
+        }
+    }
+    return table[n][m-1];
+}
+
 int msp(int arr[],int n, int sum)
 {
-/*    if(n<2)
-        return arr[0];
-    int sum=0;
-    for(int i=0;i<n;i++)
-        sum+=arr[i];
-*/
     int dp[sum+1][n];
+     
+    for(int s=0;s<=sum;s++)
+        for(int i=0;i<n;i++)
+        {
+            dp[s][i]=0;
+            if(s==0)
+            {dp[s][i]=1;continue;}
+    
+            if(i>0)
+           dp[s][i] += dp[s][i-1];// true;
+    
+            if(s>=arr[i])
+           dp[s][i] += dp[s-arr[i]][i];
+        }
+    return dp[sum][n-1];
+}
+
+int msp1(int arr[],int n, int sum)
+{
+    int dp[sum+1];
+    
+    memset(dp,0,sizeof(dp));
+    dp[0]=1;
 
     for(int s=0;s<=sum;s++)
         for(int i=0;i<n;i++)
         {
-            if(s==0)
-                dp[s][i]=1;/*
-            else if (i==0)
-                dp[s][i]=0;*/
-            else if(s>=arr[i])
-                dp[s][i] = dp[s][i-1] + dp[s-arr[i]][i-1];// true;
-            else
-                dp[s][i] = dp[s][i-1];
+            if(s>=arr[i])
+            dp[s]+=dp[s-arr[i]];
         }
-/*
-    for(int i=sum/2;i>=0;i--)
-        if(dp[i][n])
-            return abs(sum-2*i);
-*/
-    return dp[sum][n-1];
+    return dp[sum];
 }
 
 int main() {
@@ -56,7 +93,7 @@ int main() {
         int sum;
         scanf("%d",&sum);
 
-        printf("%d\n",msp(arr,n,sum));
+        printf("%d\n",msp1(arr,n,sum));
     }
 	return 0;
 }
