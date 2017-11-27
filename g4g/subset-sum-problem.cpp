@@ -13,7 +13,7 @@ void subsum(int arr[],int n)
         return;
     }
 
-    int dp[sum][n];
+    int dp[sum+1][n+1];
     for(int s=0;s<=sum/2;s++)
     {
         for(int i=0;i<=n;i++)
