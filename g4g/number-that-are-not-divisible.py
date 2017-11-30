@@ -22,17 +22,14 @@ def ugly(n):
       
       if(2*two<=min(3*three,5*five)):
         ans=two*2
-      elif(3*three<=min(2*two,5*five)):
-        ans=three*3
-      elif(5*five<=min(3*three,2*two)):
-        ans=five*5
-
-      if ans==two*2:
         two+=1
-      if ans==three*3:
+      if(3*three<=min(2*two,5*five)):
+        ans=three*3
         three+=1
-      if ans==five*5:
+      if(5*five<=min(3*three,2*two)):
+        ans=five*5
         five+=1
+
       print i+1,ans
     print (ans)
 
